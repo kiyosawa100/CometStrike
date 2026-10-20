@@ -4,53 +4,78 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class PlayerController : MonoBehaviour
 {
-    #region@‚Ö‚ñ‚·‚¤
-
-    
-    public Transform groundCheck; // ‘«Œ³‚Éİ’u‚·‚éEmptyƒIƒuƒWƒFƒNƒg
-    public float groundCheckRadius = 0.2f;
-    public LayerMask GroundLayer;
-    private Rigidbody2D rb2d; // Rigidbody2DƒRƒ“ƒ|[ƒlƒ“ƒg‚Ö‚ÌQÆ
+    #regionã€€ã¸ã‚“ã™ã†
 
     [SerializeField]
-    private TextMeshProUGUI ammoText;
+    private GameManager gameManager;
+    public Transform groundCheck; // è¶³å…ƒã«è¨­ç½®ã™ã‚‹Emptyã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    public float groundCheckRadius = 0.2f;
+    public LayerMask GroundLayer;
+    private Rigidbody2D rb2d; // Rigidbody2Dã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã¸ã®å‚ç…§
+
+    [SerializeField]
+    private GameObject aimSpPrefab;
+    private GameObject aimSpInstance;
+    [SerializeField]
+    private GameObject star; 
+    [SerializeField] private Transform stars; 
+    private List<GameObject> starList = new List<GameObject>(); 
+    [SerializeField] 
+    private GaugeController gaugeController;
+    [SerializeField]
+    private float xSpeed; // Xæ–¹å‘ç§»å‹•é€Ÿåº¦
+    [SerializeField]
+    private float jumpPower;
     [SerializeField]
     private GameObject _bullet;
     [SerializeField]
     private Transform firepoint;
-    [SerializeField]
-    public Transform[] hanten;
-    [SerializeField]
-    public Transform[] modoru;
-    [SerializeField, Header("ˆÚ“®‘¬“x")]
-    private float xSpeed; // X•ûŒüˆÚ“®‘¬“x
-    [SerializeField, Header("ƒWƒƒƒ“ƒv—Í")]
-    private float jumpPower;
-    [SerializeField, Header("”½“]ƒN[ƒ‹ƒ^ƒCƒ€")]
-    public float flipTriggerDistance = 0.1f;
-
-    [SerializeField, Header("ƒŠƒ[ƒhŠÔ")]
+    [SerializeField, Header("å¼¾ã®ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ ")]
     private float ammoCt;
-    private int maxammo = 5; //Å‘å’e”
-    private int ammo = 0;  //¡‚Ì’e”
-    private float ctTime = 0f;
+    private int maxammo = 5; //æœ€å¤§å¼¾æ•°
+    private int ammo = 0;  //ä»Šã®å¼¾æ•°
+    public float ctTime = 0f;
     private Vector2 shootDirection;
     private bool isGrounded;
-    private Vector2 move;
+    public Transform[] hanten;
+    public Transform[] modoru;
+    public Vector2 move;
     private bool jump;
 
-    public bool isFlipped = false; // ”½“]ó‘Ô‚ğŠÇ—
+    public float flipTriggerDistance = 0.2f; //è¿‘ã¥ã„ãŸã‚‰åå¿œ
+
+    public bool isFlipped = false; // åè»¢çŠ¶æ…‹ã‚’ç®¡ç†
+
+    private SpriteRenderer spriteRenderer;
     private Kometto input;
 
-    private float flipCooldown = 0.5f; // ”½“]‚µ‚Ä‚©‚çÄ”½“]‚Ü‚Å‚ÌŠÔ
-    private float lastFlipTime = -999f;
+    private Animator anim;
 
-    private int HantenIndex = 0; // Œ»İ‚Ì”½“]’n“_ƒCƒ“ƒfƒbƒNƒX
-    private int ModoruIndex = 0; // Œ»İ‚Ì–ß‚é’n“_ƒCƒ“ƒfƒbƒNƒX
+    private Vector3 FirstPos;
+    private Vector3 FirstScale;
+    private bool FirstFlipX;
+    private bool FirstFlipY;
+    private float FirstGravity;
+    private Vector3 FirstGra;
+    private bool FirstFlipped;
+    private float MaxHP = 1;
+    private float FirstCtTime = 0f;
+    [SerializeField] private GameObject WinP1;
+    [SerializeField] private GameObject WinP2;
 
+    private PlayerInput PlInput;
+
+    [SerializeField] float flashInterval;
+    //ç‚¹æ»…ã•ã›ã‚‹ã¨ãã®ãƒ«ãƒ¼ãƒ—ã‚«ã‚¦ãƒ³ãƒˆ
+    [SerializeField] int loopCount;
+    //ç‚¹æ»…ã•ã›ã‚‹ãŸã‚ã®SpriteRenderer
+    SpriteRenderer sp;
+    bool isHit;
     #endregion
 
     public float HP;
@@ -58,51 +83,135 @@ public class PlayerController : MonoBehaviour
     {
         int maxLength = Mathf.Max(hanten.Length, modoru.Length);
         rb2d = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        PlInput = GetComponent<PlayerInput>(); 
         input = new Kometto();
         input?.Enable();
+
+        aimSpInstance = Instantiate(aimSpPrefab, transform.position, Quaternion.identity);
+        aimSpInstance.SetActive(false);
+        anim = GetComponent<Animator>();
+
+        FirstPos = transform.position;
+        FirstFlipX = spriteRenderer.flipX;
+        FirstFlipY = spriteRenderer.flipY;
+        FirstGravity = rb2d.gravityScale;
+        FirstGra = rb2d.velocity;
+        FirstScale = transform.localScale;
+        FirstFlipped = isFlipped;
+
+
     }
 
-<<<<<<< HEAD
-=======
     private void OnDestroy()
     {
         input?.Disable();
     }
 
-    // Update is called once per frame
->>>>>>> main
     void Update()
     {
+        if (gameManager.GetComponent<GameManager>().GameEnd == true)
+        {
+            aimSpInstance.SetActive(false);
+            rb2d.velocity = Vector2.zero;
+            anim.SetBool("Move", false);
+
+            return;
+        }
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, GroundLayer);
- 
-      transform.position += new Vector3(move.x, 0f, 0f) * xSpeed * Time.deltaTime;
+
+        
+        anim.SetBool("Move", move.x != 0);
+        if (move.x < 0)
+        {
+            transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        else if (move.x > 0)
+        {
+            transform.eulerAngles = new Vector3(0, 180, 0);
+        }
 
         AmmoCount();
-        AmmoUI();
+
+        if (shootDirection.magnitude < 0.1f)
+        {
+            aimSpInstance.SetActive(false);
+            return;
+        }
+
+        aimSpInstance.SetActive(true);
+
+        Vector3 pos = transform.position + (Vector3)(shootDirection.normalized * 1f);
+        pos.z = -1f;
+        aimSpInstance.transform.position = pos;
+
+        float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
+        aimSpInstance.transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+
+        var aim = aimSpInstance.GetComponent<BulletController>();
+        if (aim != null)
+        {
+            aim.SetDirection(shootDirection);
+        }
+
     }
 
+    public void ResetPlayer()
+    {
+        transform.position = FirstPos;
+        transform.localScale = FirstScale;
+        rb2d.gravityScale = FirstGravity;
+        rb2d.velocity = FirstGra;
+        spriteRenderer.flipX = FirstFlipX;
+        spriteRenderer.flipY = FirstFlipY;
+        HP = MaxHP;
+        ctTime = FirstCtTime;
+        ammo = 0;
+        isFlipped = FirstFlipped;
+        move.x = 0;
+        isHit = false;
+        anim.SetBool("damage", false);
+        anim.SetBool("Move", move.x != 0);
+        // å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å…¨å‰Šé™¤
+        foreach (Transform n in stars.transform)
+        {
+            GameObject.Destroy(n.gameObject);
+        }
+        starList.Clear();
 
+    }
     public void AmmoCount()
     {
         if (ammo < maxammo)
         {
             ctTime += Time.deltaTime;
+            gaugeController.UpdateGauge(ctTime, ammoCt);
 
             if (ctTime >= ammoCt)
             {
                 ammo++;
                 ctTime = 0f;
+                gaugeController.UpdateGauge(0, ammoCt);
+                AmmoUI();
             }
         }
     }
 
     public void AmmoUI()
     {
-        ammoText.text = $"AMMO:{ammo}";
+        if (starList.Count >= maxammo) return;
+        GameObject newStar = Instantiate(star, stars);
+        starList.Add(newStar);
+
     }
+
+
+
     public void OnMove(InputAction.CallbackContext ctx)
     {
         if (ctx.started) return;
+        if (gameManager.GetComponent<GameManager>().GameEnd == true) return;
         if (ctx.performed)
         {
             move = ctx.ReadValue<Vector2>();
@@ -124,9 +233,17 @@ public class PlayerController : MonoBehaviour
         {
             if (ammo > 0)
             {
+                if (gameManager.GetComponent<GameManager>().GameEnd == true) return;
                 GameObject bullet = Instantiate(_bullet, firepoint.position, Quaternion.identity);
                 bullet.GetComponent<BulletController>().SetDirection(shootDirection);
                 ammo--;
+                if (starList.Count > 0)
+                {
+                    GameObject lastStar = starList[starList.Count - 1];
+                    starList.RemoveAt(starList.Count - 1);
+                    Destroy(lastStar);
+                }
+                SoundManager.Instance.PlaySe(SEType.SE5);
             }
 
         }
@@ -134,26 +251,53 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (ctx.performed && isGrounded)
         {   
-            if (isGrounded && ctx.ReadValueAsButton())
-            {
-
-                rb2d.velocity = new Vector2(rb2d.velocity.x, isFlipped ? -jumpPower : jumpPower); //¡‚Ìd—Í•ûŒü‚ÉƒWƒƒƒ“ƒv
-            }
+            if (gameManager.GetComponent<GameManager>().GameEnd == true) return;
+           
+            rb2d.velocity = new Vector2(rb2d.velocity.x, isFlipped ? -jumpPower : jumpPower); //ä»Šã®é‡åŠ›æ–¹å‘ã«ã‚¸ãƒ£ãƒ³ãƒ—
+            SoundManager.Instance.PlaySe(SEType.SE4);
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private async void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collision.gameObject.CompareTag("inseki")|| collision.gameObject.CompareTag("bullet1")|| collision.gameObject.CompareTag("bullet2"))
+        if (isHit == true)
         {
-            HP--;
+            return;
+        }
+        if (collider.gameObject.CompareTag("Meteorile")|| collider.gameObject.CompareTag("bullet1")|| collider.gameObject.CompareTag("bullet2"))
+        {
+            anim.SetBool("Move", false);
+            anim.SetBool("damage",true);
+            StartCoroutine(_hit());
+            GameManager.Instance.SudLifeCount(PlInput.user.index);
+            await GameManager.Instance.NextRound(PlInput.user.index);
+            //Destroy(collider.gameObject);
         }
 
     }
+    IEnumerator _hit()
+    {
+        //å½“ãŸã‚Šãƒ•ãƒ©ã‚°ã‚’trueã«å¤‰æ›´ï¼ˆå½“ãŸã£ã¦ã„ã‚‹çŠ¶æ…‹ï¼‰
+        isHit = true;
 
-    #region ‚¢‚ñ‚Õ‚Á‚Æ‚Ü‚Ë[‚¶‚á[
+        //ç‚¹æ»…ãƒ«ãƒ¼ãƒ—é–‹å§‹
+        for (int i = 0; i < loopCount; i++)
+        {
+            //flashIntervalå¾…ã£ã¦ã‹ã‚‰
+            yield return new WaitForSeconds(flashInterval);
+            //spriteRendererã‚’ã‚ªãƒ•
+            spriteRenderer.enabled = false;
+
+            //flashIntervalå¾…ã£ã¦ã‹ã‚‰
+            yield return new WaitForSeconds(flashInterval);
+            //spriteRendererã‚’ã‚ªãƒ³
+            spriteRenderer.enabled = true;
+        }
+    }
+
+    #region ã„ã‚“ã·ã£ã¨ã¾ã­ãƒ¼ã˜ã‚ƒãƒ¼
 
 
     public void MoveUpdate()
@@ -169,7 +313,7 @@ public class PlayerController : MonoBehaviour
             inputX = -1.0f;
         }
 
-        // ”½“]ó‘Ô‚È‚ç“ü—Í•ûŒü‚ğ‹t‚É‚·‚é
+        // åè»¢çŠ¶æ…‹ãªã‚‰å…¥åŠ›æ–¹å‘ã‚’é€†ã«ã™ã‚‹
         if (isFlipped)
         {
             inputX *= -1.0f;
@@ -185,7 +329,7 @@ public class PlayerController : MonoBehaviour
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             float jumpPower = 5.0f;
-            rb2d.velocity = new Vector2(rb2d.velocity.x, isFlipped ? -jumpPower : jumpPower); //¡‚Ìd—Í•ûŒü‚ÉƒWƒƒƒ“ƒv
+            rb2d.velocity = new Vector2(rb2d.velocity.x, isFlipped ? -jumpPower : jumpPower); //ä»Šã®é‡åŠ›æ–¹å‘ã«ã‚¸ãƒ£ãƒ³ãƒ—
         }
     }
 
@@ -193,10 +337,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // ˆÚ“®‘¬“xƒxƒNƒgƒ‹‚ğŒ»İ’l‚©‚çæ“¾
+        if (gameManager.GetComponent<GameManager>().GameEnd == true) return;
         Vector2 velocity = rb2d.velocity;
-        // X•ûŒü‚Ì‘¬“x‚ğ“ü—Í‚©‚çŒˆ’è
-        velocity.x = xSpeed;
-
+        velocity.x = move.x * xSpeed;
+        rb2d.velocity = velocity;
     }
+
+
 }

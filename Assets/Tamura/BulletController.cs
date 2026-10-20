@@ -4,23 +4,35 @@ using UnityEngine;
 
 public class BulletController : MonoBehaviour
 {
-    [SerializeField,Header("’e‚Ì‘¬“x")]
+    [SerializeField,Header("å¼¾ã®ã‚¹ãƒ”ãƒ¼ãƒ‰")]
     private float speed;
-    private Vector2 direction = Vector2.right;
 
-    // ’e‚ÌŒü‚«‚ğŠO•”‚©‚çİ’è
+    private Vector2 direction;
+
+
+    private static readonly Vector2 SpriteDir = new Vector2(-1f, -1f).normalized;
+
     public void SetDirection(Vector2 dir)
     {
         direction = dir.normalized;
+
+        float angle = Vector2.SignedAngle(SpriteDir, direction);
+
+        transform.rotation = Quaternion.Euler(0f, 0f, angle + 45);
     }
 
     void Update()
     {
-        transform.Translate(direction * speed * Time.deltaTime);
+
+        transform.position += (Vector3)direction * speed * Time.deltaTime;
     }
 
     private void OnBecameInvisible()
     {
-        Destroy(gameObject); // ‰æ–ÊŠO‚Éo‚½‚ç”jŠü
+        Destroy(gameObject);
+    }
+    public void OnTriggerEnter2D(Collider2D collider)
+    {
+            Destroy(gameObject);
     }
 }

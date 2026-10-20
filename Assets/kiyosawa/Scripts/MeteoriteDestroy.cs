@@ -1,10 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MeteoriteDestroy : MonoBehaviour
 {
-    public void OnCollisionEnter2D(Collision2D collision)
+    // ƒJƒƒ‰ŠO‚És‚Á‚½‚Æ‚«íœ
+    public void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
+
+    public void OnTriggerEnter2D(Collider2D collider)
     {
         Destroy(gameObject);
     }

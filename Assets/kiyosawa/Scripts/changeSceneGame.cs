@@ -1,25 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ChangeSceneGame : MonoBehaviour
 {
-    public void Restart_button()
+    [SerializeField] private FadeManager fadePanel;
+
+    public async void ChangeTitle()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-    public void changeTitle_button()
-    {
+        GetComponent<Button>().interactable = false;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SoundManager.Instance.PlaySe(SEType.SE1);
+        // 500ƒ~ƒŠ•b‘Ò‚Á‚Ä‚©‚çˆ—‚ğ‘±‚¯‚é
+        await Task.Delay(500);
+        await fadePanel.FadeOut();
+        SoundManager.Instance.PlayBgm(BGMType.BGM3);
         SceneManager.LoadScene("Title");
     }
-    public void changeGame_button(bool deleteOldScene = false)
+
+    public async void ChangeGame()
     {
+        GetComponent<Button>().interactable = false;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SoundManager.Instance.PlaySe(SEType.SE1);
+        await fadePanel.FadeOut();
         SceneManager.LoadScene("GameMain");
     }
 
-    public void ReloadScene()
+    public async void ReloadScene()
     {
-        changeGame_button(true);
+        GetComponent<Button>().interactable = false;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SoundManager.Instance.PlaySe(SEType.SE1);
+        // 500ƒ~ƒŠ•b‘Ò‚Á‚Ä‚©‚çˆ—‚ğ‘±‚¯‚é
+        await Task.Delay(500);
+        await fadePanel.FadeOut();
+        SceneManager.LoadScene("GameMain");
+    }
+
+    async void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        FadeManager fade = FindObjectOfType<FadeManager>();
+        await fade.FadeIn();
     }
 }
