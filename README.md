@@ -23,5 +23,5 @@ Unity / C# を使用して制作した、2Dアクションゲームのプロジ�
 本リポジトリはUnityのプロジェクト一式を格納しています。
 ゲームの主要なプログラムおよびアセット類は、すべて `Assets` フォルダ配下で管理・運用されています。
 
-- [**Assets フォルダを見る**](https://github.com)
+- [**Assets フォルダを見る**](https://github.com/kiyosawa100/CometStrike/tree/main/Assets)
 
