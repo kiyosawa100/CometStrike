@@ -7,7 +7,7 @@ Unity / C# を使用して制作した、2Dアクションゲームのプロジ�
 ## 開発環境
 - **ゲームエンジン**: Unity 
 - **使用言語**: C#
-- **開発ツール**: Git / GitHub, SourceTree, Visual Studio 2022 / Visual Studio Code
+- **開発ツール**: GitHub, SourceTree, Visual Studio 2022 / Visual Studio Code
 
 ---
 
